@@ -223,16 +223,20 @@
                 })
     
                 socket.on("encode:complete", ({ data }) => {
-                    const div = document.createElement("div")
-                    div.className = "p-3"
                     const encodeForm = document.querySelector("form[name='encode-form']");
-                    const downloadBtn = document.createElement("a");
-                    downloadBtn.download = '';
-                    downloadBtn.href = `{{ url_for('static', filename='image/results/encoded/${data}') }}`
-                    downloadBtn.textContent = "Download Image"
-                    downloadBtn.className = "btn btn-primary"
-                    div.appendChild(downloadBtn)
-                    encodeForm.appendChild(div);
+                    let downloadBtn = document.getElementById("download-encoded-btn");
+                    if (!downloadBtn) {
+                        const div = document.createElement("div")
+                        div.className = "p-3"
+                        downloadBtn = document.createElement("a");
+                        downloadBtn.id = "download-encoded-btn";
+                        downloadBtn.download = '';
+                        downloadBtn.textContent = "Download Image"
+                        downloadBtn.className = "btn btn-primary"
+                        div.appendChild(downloadBtn)
+                        encodeForm.appendChild(div);
+                    }
+                    downloadBtn.href = data
                 })
 
             })();

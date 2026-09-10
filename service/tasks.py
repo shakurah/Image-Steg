@@ -7,8 +7,13 @@ from service import worker
 from steg.algo import ImageParser, Format
 from main import app
 
-
+print("SOCKETIO QUEUE (celery process sees):", SOCKET_IO_MESSAGING_QUEUE)
 socketio = SocketIO(message_queue=SOCKET_IO_MESSAGING_QUEUE)
+try:
+    socketio.emit("test-event", {"msg": "celery worker startup test"})
+    print("TEST EMIT: sent without raising an exception")
+except Exception as e:
+    print("TEST EMIT FAILED:", repr(e))
 
 
 @worker.task

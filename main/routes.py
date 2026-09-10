@@ -5,25 +5,21 @@ from flask import request, flash, redirect, render_template
 
 from main.form import EncodeForm, DecodeForm
 from werkzeug.utils import secure_filename
+from settings import ENCODE_INPUT_DIR, ENCODE_OUTPUT_DIR, DECODE_INPUT_DIR, DECODE_OUTPUT_DIR
 
-
-@app.before_first_request
 def check_image_path():
     if not os.path.exists(os.path.join(app.root_path, "images")):
         os.mkdir(os.path.join(app.root_path, "images"))
+    for directory in (ENCODE_INPUT_DIR, ENCODE_OUTPUT_DIR, DECODE_INPUT_DIR, DECODE_OUTPUT_DIR):
+        os.makedirs(directory, exist_ok=True)
+
+check_image_path()
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     form = EncodeForm(request.form)
     deform = DecodeForm(request.form)
     return render_template("base.html", encode_form=form, decode_form = deform)
-
-@app.route("/encode", methods=["GET", "POST"])
-def encode_image():
-    form = EncodeForm()
-    if form.validate_on_submit():
-        return redirect("home")
-    return "Encode!!"
 
 @app.route("/decode")
 def decode_image():
