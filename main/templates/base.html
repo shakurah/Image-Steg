@@ -13,6 +13,7 @@
     integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     
     <link href="{{ url_for('static', filename = 'style.css')}}" rel="stylesheet">
+    
    
     {% if title %}
         <title> {{ title }} </title>
@@ -97,17 +98,12 @@
                                 <div class="mb-3 ">
                                     
                                     {{ encode_form.file(class='form-control', type='file',accept="image/*") }}
-                                    <div class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Dropdown button
-                                          </button>
-                                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                            <li><a class="dropdown-item" href="#">Action</a></li>
-                                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                          </ul>
+
+                                    <div class="progress" style="display: none;">
+                                        
                                     </div>
-                                      
+                                    {{ encode_form.message_file(class='form-control', type='file',accept="image/*") }}
+
                                     {{ encode_form.message(class='form-control mt-3', rows='3')}}
                                 </div>
                                 <button class="btn btn-outline-warning" id="encode-submit">
@@ -211,19 +207,33 @@
                 const { io } = await import('https://cdn.socket.io/4.4.1/socket.io.esm.min.js');
     
                 const socket = io();
-    
-    
+                const encodeForm =document.querySelector("form[name='encode-form']");
+                const progressWrapper = document.querySelector(".progress");
+                const dropDown =  document.querySelector("button#dropdownMenuButton1")
+                const messageForm = document.querySelector("[name='message']")
                 socket.on("connect", () => {
                     console.log("connected")
                     socket.emit("addUser", {_id : fp.visitorId});
+                    
                 });
     
                 socket.on("encode:progress", ({ progress }) => {
+                    progressWrapper.style.display = "block"
+                    progressWrapper.innerHTML = "";
+                    messageForm.style.display = "none";
+                    const progressBar = document.createElement('div')
+                    progressBar.classList.add("progress-bar", "bg-success", "rounded")
+                    progressBar.style.width = `${progress}%`;
+                    progressBar.textContent = progress;
+                    progressBar.setAttribute("aria-valuenow", progress )
+                    progressBar.setAttribute("role", "progressbar")
+                    progressWrapper.appendChild(progressBar)
+
+
                     console.log("encoding progress : " + progress)
                 })
     
                 socket.on("encode:complete", ({ data }) => {
-                    const encodeForm = document.querySelector("form[name='encode-form']");
                     let downloadBtn = document.getElementById("download-encoded-btn");
                     if (!downloadBtn) {
                         const div = document.createElement("div")

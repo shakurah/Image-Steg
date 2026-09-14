@@ -29,15 +29,24 @@ def decode_image():
 
 @app.route('/encode-image', methods=['POST'])
 def encode():
-    from service.tasks import encode_text_on_image
-
+    
     data = request.form
 
     f = request.files.get('file')
     img_path = f'main/static/image/temp/encode/{f.filename}'
     f.save(img_path)
-    payload = data.get("message")
     client_id = data.get("client_id")
-    
-    encode_text_on_image.delay(img_path, payload, client_id)
-    return {"status": "Success"}, 201
+    payload_message  = data.get("message")
+    payload_file = request.files.get('message_file')
+   
+    if payload_message:
+        print(payload_message)
+        from service.tasks import encode_text_on_image
+        encode_text_on_image.delay(img_path, payload_message, client_id)
+        return {"status": "Success"}, 201
+    if payload_file:
+        from service.tasks import encode_image_on_image
+        payload_file_path = f'main/static/image/temp/encode/{payload_file.filename}'
+        payload_file.save(payload_file_path)
+        encode_image_on_image.delay(img_path, payload_file_path, client_id)
+        return {"status": "Sucess"}, 201
