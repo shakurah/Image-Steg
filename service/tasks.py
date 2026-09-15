@@ -75,3 +75,4 @@ def encode_audio_on_image(img_path, audio_file, client_id):
         encoded_image_url = url_for("static", filename=filename, _external=True)
 
         socketio.emit("encode:complete", {"data": encoded_image_url}, to=client_id)
+
